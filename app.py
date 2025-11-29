@@ -35,7 +35,7 @@ def predict():
     # Make a prediction
     prediction = model.predict(scaled_input)[0]
 
-    # Return the prediction as a JSON response
     return jsonify({"prediction": int(prediction)})
-  if __name__ == "__main__":
+
+if __name__ == "__main__":
     app.run(debug=True)
