@@ -136,7 +136,7 @@ def home():
     <body>
         <div class="container">
             <h1>🤖 Machine Learning API</h1>
-            <p class="subtitle">Your model is deployed and ready to use!</p>
+            <p class="subtitle">Your model deployment interface</p>
             
             <div class="status-box">
                 <h2>📊 System Status</h2>
@@ -203,17 +203,87 @@ def health():
         "scaler_loaded": scaler is not None
     }), 200 if status == "healthy" else 503
 
+# ADD THIS: Handle GET requests to /predict
+@app.route('/predict', methods=['GET'])
+def predict_info():
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Predict Endpoint</title>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 50px auto;
+                padding: 20px;
+                background: #f5f5f5;
+            }}
+            .container {{
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }}
+            h1 {{ color: #e74c3c; }}
+            .info {{ 
+                background: #fff3cd;
+                padding: 15px;
+                border-radius: 5px;
+                border-left: 4px solid #ffc107;
+                margin: 20px 0;
+            }}
+            code {{
+                background: #2d2d2d;
+                color: #f8f8f2;
+                padding: 15px;
+                display: block;
+                border-radius: 5px;
+                overflow-x: auto;
+            }}
+            .back {{ 
+                display: inline-block;
+                margin-top: 20px;
+                padding: 10px 20px;
+                background: #667eea;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>⚠️ Method Not Allowed</h1>
+            <div class="info">
+                <strong>Note:</strong> This endpoint only accepts POST requests with JSON data.
+                You cannot access it directly from a browser.
+            </div>
+            
+            <h2>How to use this endpoint:</h2>
+            <p><strong>Using cURL:</strong></p>
+            <code>curl -X POST https://machine-learning-1-uo9w.onrender.com/predict \\
+  -H "Content-Type: application/json" \\
+  -d '{"features": [1.0, 2.0, 3.0, 4.0]}'</code>
+            
+            <a href="/" class="back">← Back to Home</a>
+        </div>
+    </body>
+    </html>
+    '''
+
+# Keep the POST handler
 @app.route('/predict', methods=['POST'])
 def predict():
     if model is None or scaler is None:
         return jsonify({
-            'error': 'Model or scaler not loaded'
+            'error': 'Model or scaler not loaded. Please ensure model.pkl and scaler.pkl exist.'
         }), 503
     
     try:
         data = request.get_json()
         if not data or 'features' not in data:
-            return jsonify({'error': 'Please provide features array'}), 400
+            return jsonify({'error': 'Please provide features array in JSON format'}), 400
         
         features = np.array(data['features']).reshape(1, -1)
         features_scaled = scaler.transform(features)
